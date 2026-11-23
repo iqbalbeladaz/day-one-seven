@@ -40,6 +40,17 @@ function main(): void {
     process.exit(1);
   }
 
+  // Tighten the shape check: the gate only accepts a full TikTok video
+  // address, https://www.tiktok.com/@<handle>/video/<digits> — a short
+  // share link or a photo post is refused, so fail loudly here instead
+  // of handing the grader an address it will throw away.
+  const url = (parsed as { url: string }).url;
+  const videoPattern = /^https:\/\/(www\.|m\.)?tiktok\.com\/@[^/]+\/video\/\d+\/?$/;
+  if (!videoPattern.test(url)) {
+    console.error(`VIDEO.json url is not a TikTok video address: ${url}`);
+    process.exit(1);
+  }
+
   mkdirSync(OUTPUT_DIR, { recursive: true });
   writeFileSync(join(OUTPUT_DIR, "VIDEO.json"), raw, "utf8");
   console.log(`VIDEO.json written to ${OUTPUT_DIR}`);
